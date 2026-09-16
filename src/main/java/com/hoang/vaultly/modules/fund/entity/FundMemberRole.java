@@ -2,17 +2,34 @@ package com.hoang.vaultly.modules.fund.entity;
 
 import com.hoang.vaultly.modules.fund.enums.FundRole;
 import jakarta.persistence.Entity;
-import jakarta.persistence.ManyToMany;
+import jakarta.persistence.*;
+import jakarta.persistence.Table;
+import lombok.AccessLevel;
 import lombok.AllArgsConstructor;
 import lombok.NoArgsConstructor;
+import lombok.experimental.FieldDefaults;
+import org.hibernate.annotations.CreationTimestamp;
+
+import java.time.Instant;
+import java.util.UUID;
 
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
+@FieldDefaults(level = AccessLevel.PRIVATE)
+@Table(name = "fund_member_roles")
 public class FundMemberRole {
+    @Id
+    @GeneratedValue(strategy = GenerationType.UUID)
+    UUID id;
 
-    @ManyToMany
-    FundMember member;
+    @JoinColumn(name = "fund_member_id")
+    @ManyToOne
+    FundMember fundMember;
 
+    @Enumerated(EnumType.STRING)
     FundRole role;
+
+    @CreationTimestamp
+    Instant grantedAt;
 }
