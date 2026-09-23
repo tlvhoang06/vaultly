@@ -8,6 +8,7 @@ import com.hoang.vaultly.modules.auth.dto.response.ChangePasswordResponse;
 import com.hoang.vaultly.modules.auth.dto.response.IntrospectResponse;
 import com.hoang.vaultly.modules.auth.dto.response.RegisterResponse;
 import com.hoang.vaultly.modules.user.entity.User;
+import com.hoang.vaultly.modules.user.mapper.UserMapper;
 import com.hoang.vaultly.modules.user.repository.UserRepository;
 import com.nimbusds.jwt.JWTClaimsSet;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class AuthService {
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
     private final PasswordEncoder passwordEncoder;
+    private final UserMapper userMapper;
 
     public AuthResponse authenticate(AuthRequest request) {
         authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(request.username(),
@@ -56,13 +58,7 @@ public class AuthService {
         user.setPassword(passwordEncoder.encode(request.password()));
         user.setDisplayName(request.displayName());
         userRepository.save(user);
-        return RegisterResponse
-                .builder()
-                .userId(user.getUserId())
-                .displayName(user.getDisplayName())
-                .username(user.getUsername())
-                .message("Register success")
-                .build();
+        return userMapper.toRegisterResponse(user);
     }
 
     @Transactional

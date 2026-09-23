@@ -15,8 +15,7 @@ public interface FundMapper {
     @Mapping(target = "members", ignore = true)
     Fund toFund(FundCreationRequest request);
 
-    @Mapping(target = "fundId", ignore = true)
-    @Mapping(target = "createdBy", source = "createdBy.userId")
+    @Mapping(target = "createdBy", source = "createdBy.id")
     FundCreationResponse toFundCreationResponse(Fund fund);
 
 

@@ -29,7 +29,7 @@ public class UserService {
         User user = getCurrentUser();
         return UserResponse
                 .builder()
-                .userId(user.getUserId())
+                .id(user.getId())
                 .username(user.getUsername())
                 .displayName(user.getDisplayName())
                 .build();
@@ -42,7 +42,7 @@ public class UserService {
         userRepository.save(user);
         return UserResponse
                 .builder()
-                .userId(user.getUserId())
+                .id(user.getId())
                 .username(user.getUsername())
                 .displayName(user.getDisplayName())
                 .build();

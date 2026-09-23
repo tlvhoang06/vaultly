@@ -16,7 +16,7 @@ import java.util.UUID;
 public class User {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
-    UUID userId;
+    UUID id;
 
     @Pattern(regexp = "^[a-zA-Z0-9_]{3,20}$", message = "Username contains 3-20 characters, only " +
             "alphabet/number/underline accepted")

@@ -5,7 +5,7 @@ import java.time.Instant;
 import java.util.UUID;
 
 public record FundCreationResponse(
-        UUID fundId,
+        UUID id,
         String name,
         String description,
         FundStatus status,
