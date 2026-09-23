@@ -5,6 +5,7 @@ import com.hoang.vaultly.common.exception.ErrorCode;
 import com.hoang.vaultly.modules.user.dto.request.UpdateProfileRequest;
 import com.hoang.vaultly.modules.user.dto.response.UserResponse;
 import com.hoang.vaultly.modules.user.entity.User;
+import com.hoang.vaultly.modules.user.mapper.UserMapper;
 import com.hoang.vaultly.modules.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +18,7 @@ import java.util.Objects;
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;
 
     public User getCurrentUser() {
         String username = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
@@ -27,12 +29,7 @@ public class UserService {
 
     public UserResponse getMyProfile() {
         User user = getCurrentUser();
-        return UserResponse
-                .builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .displayName(user.getDisplayName())
-                .build();
+        return userMapper.toUserResponse(user);
     }
 
     @Transactional
@@ -40,11 +37,6 @@ public class UserService {
         User user = getCurrentUser();
         user.setDisplayName(request.displayName());
         userRepository.save(user);
-        return UserResponse
-                .builder()
-                .id(user.getId())
-                .username(user.getUsername())
-                .displayName(user.getDisplayName())
-                .build();
+        return userMapper.toUserResponse(user);
     }
 }
