@@ -5,7 +5,7 @@ import com.hoang.vaultly.common.exception.ErrorCode;
 import com.hoang.vaultly.modules.user.entity.User;
 import com.hoang.vaultly.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
-import org.jspecify.annotations.NonNull;
+import org.jspecify.annotations.NullMarked;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.stereotype.Service;
@@ -16,7 +16,8 @@ public class CustomUserDetailService implements UserDetailsService {
     private final UserRepository userRepository;
 
     @Override
-    public UserDetails loadUserByUsername(@NonNull String username) {
+    @NullMarked
+    public UserDetails loadUserByUsername(String username) {
         User user = userRepository
                 .findByUsername(username)
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
