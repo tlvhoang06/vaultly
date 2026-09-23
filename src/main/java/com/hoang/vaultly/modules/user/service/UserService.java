@@ -18,7 +18,7 @@ import java.util.Objects;
 public class UserService {
     private final UserRepository userRepository;
 
-    private User getCurrentUser() {
+    public User getCurrentUser() {
         String username = Objects.requireNonNull(SecurityContextHolder.getContext().getAuthentication()).getName();
         return userRepository
                 .findByUsername(username)

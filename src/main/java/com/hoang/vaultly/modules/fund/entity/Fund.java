@@ -3,9 +3,7 @@ package com.hoang.vaultly.modules.fund.entity;
 import com.hoang.vaultly.modules.fund.enums.FundStatus;
 import com.hoang.vaultly.modules.user.entity.User;
 import jakarta.persistence.*;
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import lombok.experimental.FieldDefaults;
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -14,6 +12,8 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.UUID;
 
+@Builder
+@Data
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
@@ -35,14 +35,26 @@ public class Fund {
     FundStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
-            @JoinColumn(name = "created_by", nullable = false, updatable = false)
+    @JoinColumn(name = "created_by", nullable = false, updatable = false)
     User createdBy;
 
     @CreationTimestamp
     @Column(name = "created_at", nullable = false, updatable = false)
     Instant createdAt;
 
-    @OneToMany(mappedBy = "fund", fetch =FetchType.LAZY)
+    @Builder.Default
+    @OneToMany(cascade = CascadeType.ALL, mappedBy = "fund", fetch = FetchType.LAZY)
     Set<FundMember> members = new HashSet<>();
+
+    @Column(nullable = false, length = 3)
+    String currency;
+
+    public void addMember(FundMember member){
+        if(this.members == null){
+            this.members = new HashSet<>();
+        }
+        this.members.add(member);
+        member.setFund(this); // consistency in setter
+    }
 
 }
