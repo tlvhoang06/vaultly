@@ -66,7 +66,7 @@ public class JwtService {
 
         // add roles / authority to access token
         if (ACCESS_TYPE.equals(tokenType)) {
-            claims.claim("roles", "user.getroles");
+            claims.claim("roles", user.getSystemRole());
         }
 
         // sign jwt

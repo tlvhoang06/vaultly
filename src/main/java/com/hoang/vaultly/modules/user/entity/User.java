@@ -1,12 +1,15 @@
 package com.hoang.vaultly.modules.user.entity;
 
+import com.hoang.vaultly.modules.user.enums.SystemRole;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Pattern;
 import lombok.*;
 import lombok.experimental.FieldDefaults;
 
+import java.util.Set;
 import java.util.UUID;
 
+@Builder
 @Entity
 @AllArgsConstructor
 @NoArgsConstructor
@@ -31,4 +34,8 @@ public class User {
 
     @Column(nullable = false)
     String displayName;
+
+    @Builder.Default
+    @Enumerated(EnumType.STRING)
+    SystemRole systemRole = SystemRole.USER;
 }
