@@ -47,6 +47,4 @@ public class FundService {
         var savedFund = fundRepository.save(fund);
         return fundMapper.toFundCreationResponse(savedFund);
     }
-
-
 }
