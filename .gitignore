@@ -34,3 +34,6 @@ build/
 
 ### environment
 /.env
+
+### all code in 1 file
+project_context.txt
