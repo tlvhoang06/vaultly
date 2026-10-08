@@ -13,7 +13,8 @@ import java.util.Set;
 import java.util.UUID;
 
 @Builder
-@Data
+@Getter
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 @FieldDefaults(level = AccessLevel.PRIVATE)
