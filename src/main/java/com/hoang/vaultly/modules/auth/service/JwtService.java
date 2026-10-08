@@ -11,7 +11,6 @@ import com.nimbusds.jwt.SignedJWT;
 import lombok.Getter;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-
 import java.nio.charset.StandardCharsets;
 import java.text.ParseException;
 import java.time.Instant;
@@ -68,7 +67,6 @@ public class JwtService {
         // add roles / authority to access token
         if (ACCESS_TYPE.equals(tokenType)) {
             claims.claim("roles", user.getSystemRole());
-            claims.claim("permissions", user.getSystemRole().getPermissions().stream().map(Enum::name).toList());
         }
 
         // sign jwt
