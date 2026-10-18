@@ -32,8 +32,6 @@ public class FundMember {
     @ManyToOne
     Fund fund;
 
-    BigDecimal contributionRatio;
-
     @CreationTimestamp
     Instant joinedAt;
 

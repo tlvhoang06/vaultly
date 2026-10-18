@@ -14,10 +14,6 @@ public record InviteMemberRequest(
         @NotNull(message = "User ID is required")
         UUID userId,
 
-        @DecimalMax(value = "100.0", message = "Contribution ratio must not exceed 100")
-        @DecimalMin(value = "0.0", message = "Contribution ratio must be greater than or equal to 0")
-        BigDecimal contributionRatio,
-
         @NotEmpty(message = "At least one role must be assigned")
         Set<FundRole> roles
 ) {
