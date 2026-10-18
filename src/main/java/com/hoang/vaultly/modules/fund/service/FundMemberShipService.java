@@ -11,6 +11,7 @@ import com.hoang.vaultly.modules.fund.enums.FundRole;
 import com.hoang.vaultly.modules.fund.mapper.FundMemberMapper;
 import com.hoang.vaultly.modules.fund.repository.FundMemberRepository;
 import com.hoang.vaultly.modules.fund.repository.FundRepository;
+import com.hoang.vaultly.modules.ledger.service.LedgerAccountService;
 import com.hoang.vaultly.modules.user.entity.User;
 import com.hoang.vaultly.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -27,6 +28,7 @@ public class FundMemberShipService {
     private final UserRepository userRepository;
     private final FundRepository fundRepository;
     private final FundMemberRepository fundMemberRepository;
+    private final LedgerAccountService ledgerAccountService;
 
     /*
         TODO:
@@ -34,10 +36,12 @@ public class FundMemberShipService {
      */
 
     public FundMemberResponse inviteMember(UUID fundId, InviteMemberRequest request) {
+        if(request.roles() != null && request.roles().contains(FundRole.FUND_OWNER)){
+            throw new AppException(ErrorCode.CANNOT_ASSIGN_OWNER);
+        }
         if (fundMemberRepository.existsByFund_IdAndUser_Id(fundId, request.userId())) {
             throw new AppException(ErrorCode.ALREADY_FUND_MEMBER);
         }
-
         User user = userRepository
                 .findById(request.userId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
@@ -49,6 +53,8 @@ public class FundMemberShipService {
         }
 
         FundMember savedMember = fundMemberRepository.save(fundMember);
+        ledgerAccountService.openMemberAccounts(savedMember);
+
         return fundMemberMapper.toFundMemberResponse(savedMember);
     }
 

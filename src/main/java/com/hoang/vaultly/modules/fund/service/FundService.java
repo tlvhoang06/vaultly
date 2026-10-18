@@ -8,6 +8,7 @@ import com.hoang.vaultly.modules.fund.enums.FundRole;
 import com.hoang.vaultly.modules.fund.enums.FundStatus;
 import com.hoang.vaultly.modules.fund.mapper.FundMapper;
 import com.hoang.vaultly.modules.fund.repository.FundRepository;
+import com.hoang.vaultly.modules.ledger.service.LedgerAccountService;
 import com.hoang.vaultly.modules.user.entity.User;
 import com.hoang.vaultly.modules.user.service.UserService;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +21,7 @@ import org.springframework.transaction.annotation.Transactional;
 public class FundService {
     private final FundRepository fundRepository;
     private final UserService userService;
+    private final LedgerAccountService ledgerAccountService;
     private final FundMapper fundMapper;
     @Transactional
     public FundCreationResponse createFund(FundCreationRequest request) {
@@ -45,6 +47,10 @@ public class FundService {
         // -> Spring Data JPA: Should store objects returned by repo.save()
         // to ensure that instance has both ID and Timestamp before go through mapper
         var savedFund = fundRepository.save(fund);
+
+        ledgerAccountService.openFundAccounts(fund);
+        ledgerAccountService.openMemberAccounts(owner);
+
         return fundMapper.toFundCreationResponse(savedFund);
     }
 }
