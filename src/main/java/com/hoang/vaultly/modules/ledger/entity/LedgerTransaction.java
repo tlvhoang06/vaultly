@@ -14,21 +14,26 @@ import java.util.UUID;
 
 @Entity
 @NoArgsConstructor
+@Table(name = "ledger_transaction", uniqueConstraints = @UniqueConstraint(columnNames = {"fund_id",
+        "idempotency_key"}))
 public class LedgerTransaction {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "transaction")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "transaction", cascade = CascadeType.PERSIST)
     List<LedgerEntry> ledgerEntries;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
     TransactionStatus transactionStatus;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, updatable = false)
     TransactionType transactionType;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "fund_id", nullable = false, updatable = false)
     Fund fund;
 
     @ManyToOne(fetch = FetchType.LAZY, optional = false)
@@ -39,5 +44,7 @@ public class LedgerTransaction {
     Instant createdAt;
 
     String description;
+
+    @Column(name = "idempotency_key", nullable = false, updatable = false)
     UUID idempotencyKey;
 }

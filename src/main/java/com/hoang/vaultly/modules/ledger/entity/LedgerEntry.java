@@ -18,16 +18,18 @@ public class LedgerEntry {
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
 
-    @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "transaction_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "transaction_id", nullable = false, updatable = false)
     LedgerTransaction transaction;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, updatable = false)
     EntryType entryType;
 
-    @ManyToOne
-    @JoinColumn(name = "ledger_account_id")
+    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @JoinColumn(name = "ledger_account_id", nullable = false, updatable = false)
     LedgerAccount ledgerAccount;
 
+    @Column(nullable = false, updatable = false)
     BigDecimal amount;
 }
