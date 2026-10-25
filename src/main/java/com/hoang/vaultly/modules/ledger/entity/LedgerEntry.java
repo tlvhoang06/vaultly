@@ -2,9 +2,7 @@ package com.hoang.vaultly.modules.ledger.entity;
 
 import com.hoang.vaultly.modules.ledger.enums.EntryType;
 import jakarta.persistence.*;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
 
 import java.math.BigDecimal;
 import java.util.UUID;
@@ -13,6 +11,8 @@ import java.util.UUID;
 @Getter
 @Entity
 @NoArgsConstructor
+@Builder
+@AllArgsConstructor
 public class LedgerEntry {
     @Id
     @GeneratedValue(strategy = GenerationType.UUID)
