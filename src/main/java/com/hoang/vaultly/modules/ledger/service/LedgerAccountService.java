@@ -12,11 +12,14 @@ import org.springframework.stereotype.Service;
 @AllArgsConstructor
 public class LedgerAccountService {
     private final LedgerAccountRepository ledgerAccountRepository;
-    // LOGIC:
-    // - Fund: When creating a Fund, the system provides 4 ledger accounts:
-    // CASH, INVESTMENT, EXPENSE, REVENUE for that fund
-    // - Member: When a member join a fund, the system provides a ledger account MEMBER_EQUITY
-    // for that member (scalable)
+    /**
+     LOGIC:
+     - Fund: When creating a Fund, the system provides 4 ledger accounts:
+     CASH, INVESTMENT, EXPENSE, REVENUE for that fund
+     - Member: When a member join a fund, the system provides a ledger account MEMBER_EQUITY
+     for that member (scalable)
+
+     */
 
 
     // open all account types in scope Fund
