@@ -113,6 +113,46 @@ public class LedgerService {
         return transactionResponseMapper.toLedgerTransactionResponse(savedTransaction);
     }
 
+    /**
+     * expense() tracks the money spent by storing in an expense ledger account
+     * EXPENSE: fund export money on investments, expenses, etc.
+     * - DEBIT: EXPENSE
+     * - CREDIT: CASH
+     */
+    public LedgerTransactionResponse expense(UUID fundId, LedgerTransactionRequest request){
+        Fund fund = getFundOrThrow(fundId);
+        User currentUser = userService.getCurrentUser();
+        FundMember fundMember = fundMemberRepository.findByFund_IdAndUser_Id(fundId, currentUser.getId());
+
+        // Find expense and cash ledger accounts
+        LedgerAccount cashAccount = getFundAccount(fundId, AccountType.CASH);
+        LedgerAccount expenseAccount = getFundAccount(fundId, AccountType.EXPENSE);
+
+        // Check if fund cash is sufficient
+        BigDecimal fundCash = getBalance(cashAccount);
+        if(fundCash.compareTo(request.amount()) < 0){
+            throw new AppException(ErrorCode.INSUFFICIENT_FUND_CASH);
+        }
+
+
+        // Create transaction
+        LedgerTransaction ledgerTransaction = LedgerTransaction.builder()
+                .transactionType(TransactionType.EXPENSE)
+                .transactionStatus(TransactionStatus.COMPLETED)
+                .fund(fund)
+                .createdBy(currentUser)
+                .description(request.description())
+                .idempotencyKey(request.idempotencyKey())
+                .build();
+
+        ledgerTransaction.recordEntry(cashAccount, EntryType.CREDIT, request.amount());
+        ledgerTransaction.recordEntry(expenseAccount, EntryType.DEBIT, request.amount());
+
+        LedgerTransaction savedTransaction = ledgerTransactionRepository.save(ledgerTransaction);
+
+        return transactionResponseMapper.toLedgerTransactionResponse(savedTransaction);
+    }
+
     private Fund getFundOrThrow(UUID fundId) {
         return fundRepository.findById(fundId).orElseThrow(() -> new AppException(ErrorCode.FUND_NOT_FOUND));
     }

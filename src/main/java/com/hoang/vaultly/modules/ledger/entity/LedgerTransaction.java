@@ -14,6 +14,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import java.math.BigDecimal;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -30,7 +31,7 @@ public class LedgerTransaction {
     UUID id;
 
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "transaction", cascade = CascadeType.PERSIST)
-    List<LedgerEntry> ledgerEntries;
+    List<LedgerEntry> ledgerEntries = new ArrayList<>();
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)

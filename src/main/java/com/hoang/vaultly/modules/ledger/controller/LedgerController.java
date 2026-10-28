@@ -30,4 +30,12 @@ public class LedgerController {
     ) {
         return ledgerService.withdrawal(fundId, request);
     }
+
+    @PostMapping("/expense")
+    public LedgerTransactionResponse expense(
+            @PathVariable UUID fundId,
+            @Valid @RequestBody LedgerTransactionRequest request
+    ) {
+        return ledgerService.expense(fundId, request);
+    }
 }
