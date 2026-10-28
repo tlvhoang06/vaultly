@@ -8,6 +8,7 @@ import java.util.List;
 
 @Getter
 public enum AccountType {
+    // [AccountType| scope (fund/member) | normalSide (debit/credit)]
     CASH(Scope.FUND, EntryType.DEBIT),
     INVESTMENT(Scope.FUND, EntryType.DEBIT),
     EXPENSE(Scope.FUND, EntryType.DEBIT),

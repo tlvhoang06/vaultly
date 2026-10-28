@@ -32,6 +32,7 @@ public class LedgerAccount {
     FundMember fundMember;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false, updatable = false)
     AccountType accountType;
 
     public static LedgerAccount ofFund(Fund fund, AccountType type){

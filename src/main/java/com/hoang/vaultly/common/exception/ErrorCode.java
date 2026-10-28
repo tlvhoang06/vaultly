@@ -30,7 +30,12 @@ public enum ErrorCode {
     CANNOT_REMOVE_OWNER(1305, "Fund has to have at least 1 owner", HttpStatus.BAD_REQUEST),
     CANNOT_ASSIGN_OWNER(1306, "Fund has to have at most 1 owner", HttpStatus.BAD_REQUEST),
     ALREADY_FUND_MEMBER(1307, "User is already in this fund", HttpStatus.BAD_REQUEST),
-    MEMBER_MUST_HAVE_ONE_ROLE(1308, "Member must have at least one role", HttpStatus.BAD_REQUEST);
+    MEMBER_MUST_HAVE_ONE_ROLE(1308, "Member must have at least one role", HttpStatus.BAD_REQUEST),
+
+    INSUFFICIENT_MEMBER_EQUITY(1401, "Member equity is insufficient", HttpStatus.BAD_REQUEST),
+    INSUFFICIENT_FUND_CASH(1402, "Fund cash is insufficient", HttpStatus.BAD_REQUEST);
+
+
     int code;
     String message;
     HttpStatus statusCode;
