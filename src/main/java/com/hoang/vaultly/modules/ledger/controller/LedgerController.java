@@ -5,10 +5,7 @@ import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionResponse;
 import com.hoang.vaultly.modules.ledger.service.LedgerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
@@ -19,7 +16,18 @@ public class LedgerController {
     private final LedgerService ledgerService;
 
     @PostMapping("/deposit")
-    public LedgerTransactionResponse deposit(@PathVariable UUID fundId, @Valid LedgerTransactionRequest request){
+    public LedgerTransactionResponse deposit(
+            @PathVariable UUID fundId,
+            @Valid @RequestBody LedgerTransactionRequest request
+    ) {
         return ledgerService.deposit(fundId, request);
+    }
+
+    @PostMapping("/withdrawal")
+    public LedgerTransactionResponse withdrawal(
+            @PathVariable UUID fundId,
+            @Valid @RequestBody LedgerTransactionRequest request
+    ) {
+        return ledgerService.withdrawal(fundId, request);
     }
 }

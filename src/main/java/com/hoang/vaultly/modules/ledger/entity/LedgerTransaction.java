@@ -60,6 +60,7 @@ public class LedgerTransaction {
         LedgerEntry entry = LedgerEntry.builder()
                 .entryType(entryType)
                 .ledgerAccount(account)
+                .amount(amount)
                 .transaction(this)
                 .build();
         this.ledgerEntries.add(entry);

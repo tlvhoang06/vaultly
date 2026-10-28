@@ -66,7 +66,7 @@ public class LedgerService {
 
         LedgerTransaction savedTransaction = ledgerTransactionRepository.save(ledgerTransaction);
 
-        return transactionResponseMapper.toLedgerTransactionResponse(ledgerTransaction);
+        return transactionResponseMapper.toLedgerTransactionResponse(savedTransaction);
     }
 
     /**

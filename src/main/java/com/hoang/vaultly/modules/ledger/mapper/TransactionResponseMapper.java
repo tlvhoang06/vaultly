@@ -11,9 +11,9 @@ import java.math.BigDecimal;
 
 @Mapper(componentModel = "spring")
 public interface TransactionResponseMapper {
-    @Mapping(target = "ledgerEntries", ignore = true)
+    @Mapping(target = "transactionId", source = "id")
     @Mapping(target = "fundId", source = "fund.id")
-    @Mapping(target = "idempotencyKey", ignore = true)
+    @Mapping(target = "createdBy", source = "createdBy.id")
     @Mapping(target = "amount", expression = "java(calculateTransactionAmount(ledgerTransaction))")
     LedgerTransactionResponse toLedgerTransactionResponse(LedgerTransaction ledgerTransaction);
 
