@@ -47,6 +47,9 @@ public class LedgerService {
         User currentUser = userService.getCurrentUser();
         FundMember fundMember = fundMemberRepository.findByFund_IdAndUser_Id(fund.getId(), currentUser.getId());
 
+        // Check unique idempotency key
+        checkIdempotencyKey(fundId, request.idempotencyKey());
+
         // Find member and fund ledger account
         LedgerAccount cashAccount = getFundAccount(fund.getId(), AccountType.CASH);
         LedgerAccount memberEquityAccount = getMemberAccount(fundMember.getId(), AccountType.MEMBER_EQUITY);
@@ -78,6 +81,9 @@ public class LedgerService {
         Fund fund = getFundOrThrow(fundId);
         User currentUser = userService.getCurrentUser();
         FundMember fundMember = fundMemberRepository.findByFund_IdAndUser_Id(fundId, currentUser.getId());
+
+        // Check unique idempotency key
+        checkIdempotencyKey(fundId, request.idempotencyKey());
 
         // Find member and fund ledger accounts
         LedgerAccount cashAccount = getFundAccount(fundId, AccountType.CASH);
@@ -124,6 +130,9 @@ public class LedgerService {
         User currentUser = userService.getCurrentUser();
         FundMember fundMember = fundMemberRepository.findByFund_IdAndUser_Id(fundId, currentUser.getId());
 
+        // Check unique idempotency key
+        checkIdempotencyKey(fundId, request.idempotencyKey());
+
         // Find expense and cash ledger accounts
         LedgerAccount cashAccount = getFundAccount(fundId, AccountType.CASH);
         LedgerAccount expenseAccount = getFundAccount(fundId, AccountType.EXPENSE);
@@ -168,5 +177,11 @@ public class LedgerService {
     private BigDecimal getBalance(LedgerAccount account){
         return ledgerAccountRepository.calculateAccountBalance(account.getId(),
                 account.getAccountType().getNormalSide());
+    }
+
+    private void checkIdempotencyKey(UUID fundId, UUID idempotencyKey){
+        if(ledgerTransactionRepository.existsByFund_IdAndIdempotencyKey(fundId, idempotencyKey)){
+            throw new AppException(ErrorCode.TRANSACTION_DUPLICATE);
+        }
     }
 }

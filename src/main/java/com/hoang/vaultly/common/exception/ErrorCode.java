@@ -33,8 +33,9 @@ public enum ErrorCode {
     MEMBER_MUST_HAVE_ONE_ROLE(1308, "Member must have at least one role", HttpStatus.BAD_REQUEST),
 
     INSUFFICIENT_MEMBER_EQUITY(1401, "Member equity is insufficient", HttpStatus.BAD_REQUEST),
-    INSUFFICIENT_FUND_CASH(1402, "Fund cash is insufficient", HttpStatus.BAD_REQUEST);
+    INSUFFICIENT_FUND_CASH(1402, "Fund cash is insufficient", HttpStatus.BAD_REQUEST),
 
+    TRANSACTION_DUPLICATE(1501, "Idempotency key hits, this transaction exists", HttpStatus.BAD_REQUEST);
 
     int code;
     String message;
