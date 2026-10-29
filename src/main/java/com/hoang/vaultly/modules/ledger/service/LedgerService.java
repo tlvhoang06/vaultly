@@ -43,9 +43,9 @@ public class LedgerService {
      * - CREDIT: MEMBER_EQUITY
      */
     public LedgerTransactionResponse deposit(UUID fundId, LedgerTransactionRequest request) {
-        Fund fund = getFundOrThrow(fundId);
+        Fund fund = getFund(fundId);
         User currentUser = userService.getCurrentUser();
-        FundMember fundMember = fundMemberRepository.findByFund_IdAndUser_Id(fund.getId(), currentUser.getId());
+        FundMember fundMember = getMember(fundId, currentUser.getId());
 
         // Check unique idempotency key
         checkIdempotencyKey(fundId, request.idempotencyKey());
@@ -78,9 +78,9 @@ public class LedgerService {
      * - CREDIT: CASH
      */
     public LedgerTransactionResponse withdrawal(UUID fundId, LedgerTransactionRequest request) {
-        Fund fund = getFundOrThrow(fundId);
+        Fund fund = getFund(fundId);
         User currentUser = userService.getCurrentUser();
-        FundMember fundMember = fundMemberRepository.findByFund_IdAndUser_Id(fundId, currentUser.getId());
+        FundMember fundMember = getMember(fundId, currentUser.getId());
 
         // Check unique idempotency key
         checkIdempotencyKey(fundId, request.idempotencyKey());
@@ -91,13 +91,13 @@ public class LedgerService {
 
         // Check if member equity is withdrawable
         BigDecimal memberEquity = getBalance(memberAccount);
-        if(memberEquity.compareTo(request.amount()) < 0){
+        if (memberEquity.compareTo(request.amount()) < 0) {
             throw new AppException(ErrorCode.INSUFFICIENT_MEMBER_EQUITY);
         }
 
         // Check if remaining fund actual cash is enough for withdrawal
         BigDecimal fundCash = getBalance(cashAccount);
-        if(fundCash.compareTo(request.amount()) < 0){
+        if (fundCash.compareTo(request.amount()) < 0) {
             throw new AppException(ErrorCode.INSUFFICIENT_FUND_CASH);
         }
 
@@ -125,10 +125,10 @@ public class LedgerService {
      * - DEBIT: EXPENSE
      * - CREDIT: CASH
      */
-    public LedgerTransactionResponse expense(UUID fundId, LedgerTransactionRequest request){
-        Fund fund = getFundOrThrow(fundId);
+    public LedgerTransactionResponse expense(UUID fundId, LedgerTransactionRequest request) {
+        Fund fund = getFund(fundId);
         User currentUser = userService.getCurrentUser();
-        FundMember fundMember = fundMemberRepository.findByFund_IdAndUser_Id(fundId, currentUser.getId());
+        FundMember fundMember = getMember(fundId, currentUser.getId());
 
         // Check unique idempotency key
         checkIdempotencyKey(fundId, request.idempotencyKey());
@@ -139,7 +139,7 @@ public class LedgerService {
 
         // Check if fund cash is sufficient
         BigDecimal fundCash = getBalance(cashAccount);
-        if(fundCash.compareTo(request.amount()) < 0){
+        if (fundCash.compareTo(request.amount()) < 0) {
             throw new AppException(ErrorCode.INSUFFICIENT_FUND_CASH);
         }
 
@@ -162,25 +162,34 @@ public class LedgerService {
         return transactionResponseMapper.toLedgerTransactionResponse(savedTransaction);
     }
 
-    private Fund getFundOrThrow(UUID fundId) {
+    private Fund getFund(UUID fundId) {
         return fundRepository.findById(fundId).orElseThrow(() -> new AppException(ErrorCode.FUND_NOT_FOUND));
     }
 
+    private FundMember getMember(UUID fundId, UUID userId){
+        return fundMemberRepository
+                .findByFund_IdAndUser_Id(fundId, userId)
+                .orElseThrow(() -> new AppException(ErrorCode.FUND_MEMBER_NOT_FOUND));
+    }
     private LedgerAccount getFundAccount(UUID fundId, AccountType type) {
-        return ledgerAccountRepository.findByFund_IdAndAccountType(fundId, type);
+        return ledgerAccountRepository
+                .findByFund_IdAndAccountType(fundId, type)
+                .orElseThrow(() -> new AppException(ErrorCode.LEDGER_ACCOUNT_NOT_FOUND));
     }
 
     private LedgerAccount getMemberAccount(UUID memberId, AccountType type) {
-        return ledgerAccountRepository.findByFundMember_IdAndAccountType(memberId, type);
+        return ledgerAccountRepository
+                .findByFundMember_IdAndAccountType(memberId, type)
+                .orElseThrow(() -> new AppException(ErrorCode.LEDGER_ACCOUNT_NOT_FOUND));
     }
 
-    private BigDecimal getBalance(LedgerAccount account){
+    private BigDecimal getBalance(LedgerAccount account) {
         return ledgerAccountRepository.calculateAccountBalance(account.getId(),
                 account.getAccountType().getNormalSide());
     }
 
-    private void checkIdempotencyKey(UUID fundId, UUID idempotencyKey){
-        if(ledgerTransactionRepository.existsByFund_IdAndIdempotencyKey(fundId, idempotencyKey)){
+    private void checkIdempotencyKey(UUID fundId, UUID idempotencyKey) {
+        if (ledgerTransactionRepository.existsByFund_IdAndIdempotencyKey(fundId, idempotencyKey)) {
             throw new AppException(ErrorCode.TRANSACTION_DUPLICATE);
         }
     }

@@ -30,6 +30,7 @@ public class LedgerTransaction {
     @GeneratedValue(strategy = GenerationType.UUID)
     UUID id;
 
+    @Builder.Default
     @OneToMany(fetch = FetchType.EAGER, mappedBy = "transaction", cascade = CascadeType.PERSIST)
     List<LedgerEntry> ledgerEntries = new ArrayList<>();
 

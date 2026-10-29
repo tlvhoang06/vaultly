@@ -34,6 +34,7 @@ public enum ErrorCode {
 
     INSUFFICIENT_MEMBER_EQUITY(1401, "Member equity is insufficient", HttpStatus.BAD_REQUEST),
     INSUFFICIENT_FUND_CASH(1402, "Fund cash is insufficient", HttpStatus.BAD_REQUEST),
+    LEDGER_ACCOUNT_NOT_FOUND(1403, "Ledger account not found", HttpStatus.BAD_REQUEST),
 
     TRANSACTION_DUPLICATE(1501, "Idempotency key hits, this transaction exists", HttpStatus.BAD_REQUEST);
 
