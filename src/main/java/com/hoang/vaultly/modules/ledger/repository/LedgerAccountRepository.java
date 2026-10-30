@@ -9,12 +9,13 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import java.math.BigDecimal;
+import java.util.Optional;
 import java.util.UUID;
 
 public interface LedgerAccountRepository extends JpaRepository<LedgerAccount, UUID> {
-    LedgerAccount findByFund_IdAndAccountType(UUID fundId, AccountType accountType);
+    Optional<LedgerAccount> findByFund_IdAndAccountType(UUID fundId, AccountType accountType);
 
-    LedgerAccount findByFundMember_IdAndAccountType(UUID fundMemberId, AccountType accountType);
+    Optional<LedgerAccount> findByFundMember_IdAndAccountType(UUID fundMemberId, AccountType accountType);
 
     @Query("""
     SELECT COALESCE(
