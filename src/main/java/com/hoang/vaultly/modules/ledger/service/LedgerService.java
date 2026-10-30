@@ -7,6 +7,7 @@ import com.hoang.vaultly.modules.fund.entity.FundMember;
 import com.hoang.vaultly.modules.fund.repository.FundMemberRepository;
 import com.hoang.vaultly.modules.fund.repository.FundRepository;
 import com.hoang.vaultly.modules.ledger.dto.request.LedgerTransactionRequest;
+import com.hoang.vaultly.modules.ledger.dto.response.FundBalanceResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionResponse;
 import com.hoang.vaultly.modules.ledger.entity.LedgerAccount;
 import com.hoang.vaultly.modules.ledger.entity.LedgerTransaction;
@@ -23,7 +24,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
+import java.util.List;
 import java.util.UUID;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -162,15 +165,50 @@ public class LedgerService {
         return transactionResponseMapper.toLedgerTransactionResponse(savedTransaction);
     }
 
+    /**
+     * Get balance of fund expense, fund cash and current user's equity
+     *
+     * @return FundBalanceResponse
+     */
+    public FundBalanceResponse getFundBalance(UUID fundId) {
+        Fund fund = getFund(fundId);
+        User currentUser = userService.getCurrentUser();
+        FundMember fundMember = getMember(fundId, currentUser.getId());
+
+        LedgerAccount cashAccount = getFundAccount(fundId, AccountType.CASH);
+        LedgerAccount expenseAccount = getFundAccount(fundId, AccountType.EXPENSE);
+        LedgerAccount memberEquity = getMemberAccount(fundMember.getId(), AccountType.MEMBER_EQUITY);
+
+        return new FundBalanceResponse(fundId, fund.getCurrency(), getBalance(cashAccount), getBalance(expenseAccount),
+                getBalance(memberEquity));
+    }
+
+    /**
+     * Get the transaction log
+     *
+     * @return a List of LedgerTransactionResponse
+     */
+    public List<LedgerTransactionResponse> getTransactions(UUID fundId) {
+        // Ensure fund exists and member the service caller belongs to fund
+        getFund(fundId);
+        getMember(fundId, userService.getCurrentUser().getId());
+
+        return ledgerTransactionRepository
+                .findByFund_IdOrderByCreatedAtDesc(fundId)
+                .stream().map(transactionResponseMapper::toLedgerTransactionResponse)
+                .collect(Collectors.toList());
+    }
+
     private Fund getFund(UUID fundId) {
         return fundRepository.findById(fundId).orElseThrow(() -> new AppException(ErrorCode.FUND_NOT_FOUND));
     }
 
-    private FundMember getMember(UUID fundId, UUID userId){
+    private FundMember getMember(UUID fundId, UUID userId) {
         return fundMemberRepository
                 .findByFund_IdAndUser_Id(fundId, userId)
                 .orElseThrow(() -> new AppException(ErrorCode.FUND_MEMBER_NOT_FOUND));
     }
+
     private LedgerAccount getFundAccount(UUID fundId, AccountType type) {
         return ledgerAccountRepository
                 .findByFund_IdAndAccountType(fundId, type)

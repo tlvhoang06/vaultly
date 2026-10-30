@@ -1,12 +1,14 @@
 package com.hoang.vaultly.modules.ledger.controller;
 
 import com.hoang.vaultly.modules.ledger.dto.request.LedgerTransactionRequest;
+import com.hoang.vaultly.modules.ledger.dto.response.FundBalanceResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionResponse;
 import com.hoang.vaultly.modules.ledger.service.LedgerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -37,5 +39,15 @@ public class LedgerController {
             @Valid @RequestBody LedgerTransactionRequest request
     ) {
         return ledgerService.expense(fundId, request);
+    }
+
+    @GetMapping("/balance")
+    public FundBalanceResponse getFundBalance(@PathVariable UUID fundId){
+        return ledgerService.getFundBalance(fundId);
+    }
+
+    @GetMapping("/transactions")
+    public List<LedgerTransactionResponse> getTransactions(@PathVariable UUID fundId){
+        return ledgerService.getTransactions(fundId);
     }
 }
