@@ -1,5 +1,6 @@
 package com.hoang.vaultly.modules.ledger.controller;
 
+import com.hoang.vaultly.common.dto.ApiResponse;
 import com.hoang.vaultly.modules.ledger.dto.request.LedgerTransactionRequest;
 import com.hoang.vaultly.modules.ledger.dto.response.FundBalanceResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionResponse;
@@ -18,36 +19,36 @@ public class LedgerController {
     private final LedgerService ledgerService;
 
     @PostMapping("/deposit")
-    public LedgerTransactionResponse deposit(
+    public ApiResponse<LedgerTransactionResponse> deposit(
             @PathVariable UUID fundId,
             @Valid @RequestBody LedgerTransactionRequest request
     ) {
-        return ledgerService.deposit(fundId, request);
+        return ApiResponse.success(ledgerService.deposit(fundId, request));
     }
 
     @PostMapping("/withdrawal")
-    public LedgerTransactionResponse withdrawal(
+    public ApiResponse<LedgerTransactionResponse> withdrawal(
             @PathVariable UUID fundId,
             @Valid @RequestBody LedgerTransactionRequest request
     ) {
-        return ledgerService.withdrawal(fundId, request);
+        return ApiResponse.success(ledgerService.withdrawal(fundId, request));
     }
 
     @PostMapping("/expense")
-    public LedgerTransactionResponse expense(
+    public ApiResponse<LedgerTransactionResponse> expense(
             @PathVariable UUID fundId,
             @Valid @RequestBody LedgerTransactionRequest request
     ) {
-        return ledgerService.expense(fundId, request);
+        return ApiResponse.success(ledgerService.expense(fundId, request));
     }
 
     @GetMapping("/balance")
-    public FundBalanceResponse getFundBalance(@PathVariable UUID fundId){
-        return ledgerService.getFundBalance(fundId);
+    public ApiResponse<FundBalanceResponse> getFundBalance(@PathVariable UUID fundId){
+        return ApiResponse.success(ledgerService.getFundBalance(fundId));
     }
 
     @GetMapping("/transactions")
-    public List<LedgerTransactionResponse> getTransactions(@PathVariable UUID fundId){
-        return ledgerService.getTransactions(fundId);
+    public ApiResponse<List<LedgerTransactionResponse>> getTransactions(@PathVariable UUID fundId){
+        return ApiResponse.success(ledgerService.getTransactions(fundId));
     }
 }
