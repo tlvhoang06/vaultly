@@ -9,6 +9,8 @@ import com.hoang.vaultly.modules.user.mapper.UserMapper;
 import com.hoang.vaultly.modules.user.repository.UserRepository;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
@@ -38,5 +40,13 @@ public class UserService {
         user.setDisplayName(request.displayName());
         userRepository.save(user);
         return userMapper.toUserResponse(user);
+    }
+
+    public Page<UserResponse> searchUsers(String keyword, Pageable pageable) {
+        if (keyword == null || keyword.trim().isEmpty()) {
+            return Page.empty(pageable);
+        }
+        return userRepository.searchUsers(keyword.trim(), pageable)
+                .map(userMapper::toUserResponse);
     }
 }
