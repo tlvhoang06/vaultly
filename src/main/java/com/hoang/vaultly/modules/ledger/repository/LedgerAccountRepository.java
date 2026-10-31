@@ -35,4 +35,7 @@ public interface LedgerAccountRepository extends JpaRepository<LedgerAccount, UU
     default BigDecimal calculateAccountBalance(UUID accountId, EntryType normalSide) {
         return calculateAccountBalance(accountId, normalSide, TransactionStatus.COMPLETED);
     }
+
+    @Query("SELECT COUNT(e) > 0 FROM LedgerEntry e WHERE e.ledgerAccount.id = :accountId")
+    boolean hasEntries(@Param("accountId") UUID accountId);
 }

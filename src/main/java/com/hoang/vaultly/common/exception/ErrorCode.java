@@ -13,6 +13,7 @@ public enum ErrorCode {
     USER_NOT_FOUND(1002, "User not found", HttpStatus.NOT_FOUND),
     USERNAME_EXISTS(1003, "Username existed", HttpStatus.BAD_REQUEST),
     NEW_PASSWORD_SAME_AS_OLD(1004, "New password is similar to old password", HttpStatus.BAD_REQUEST),
+    UNAUTHORIZED_ACTION(1005, "You do not have permission to perform this action", HttpStatus.FORBIDDEN),
 
     // JWT Exception
     INVALID_TOKEN(1101, "Invalid Token", HttpStatus.BAD_REQUEST),
@@ -20,7 +21,6 @@ public enum ErrorCode {
 
     // Fund Exception
     FUND_NOT_FOUND(1201, "Fund not found", HttpStatus.NOT_FOUND),
-
 
     // Fund Member Exception
     FUND_MEMBER_NOT_FOUND(1301, "Fund member not found", HttpStatus.NOT_FOUND),
@@ -31,12 +31,17 @@ public enum ErrorCode {
     CANNOT_ASSIGN_OWNER(1306, "Fund has to have at most 1 owner", HttpStatus.BAD_REQUEST),
     ALREADY_FUND_MEMBER(1307, "User is already in this fund", HttpStatus.BAD_REQUEST),
     MEMBER_MUST_HAVE_ONE_ROLE(1308, "Member must have at least one role", HttpStatus.BAD_REQUEST),
+    CANNOT_REMOVE_MEMBER_WITH_TRANSACTIONS(1309, "Cannot remove member with transaction history", HttpStatus.BAD_REQUEST),
+    MEMBER_HAS_ACTIVE_BALANCE(1310, "Member still has balance in fund", HttpStatus.BAD_REQUEST),
 
+    // Ledger Exception
     INSUFFICIENT_MEMBER_EQUITY(1401, "Member equity is insufficient", HttpStatus.BAD_REQUEST),
     INSUFFICIENT_FUND_CASH(1402, "Fund cash is insufficient", HttpStatus.BAD_REQUEST),
     LEDGER_ACCOUNT_NOT_FOUND(1403, "Ledger account not found", HttpStatus.BAD_REQUEST),
 
-    TRANSACTION_DUPLICATE(1501, "Idempotency key hits, this transaction exists", HttpStatus.BAD_REQUEST);
+    // Transaction Exception
+    TRANSACTION_DUPLICATE(1501, "Idempotency key hits, this transaction exists", HttpStatus.BAD_REQUEST),
+    TRANSACTION_NOT_FOUND(1502, "Transaction not found", HttpStatus.NOT_FOUND);
 
     int code;
     String message;

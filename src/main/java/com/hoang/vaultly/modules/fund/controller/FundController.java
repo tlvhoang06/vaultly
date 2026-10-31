@@ -7,12 +7,14 @@ import com.hoang.vaultly.modules.fund.dto.request.InviteMemberRequest;
 import com.hoang.vaultly.modules.fund.dto.request.RemoveRoleRequest;
 import com.hoang.vaultly.modules.fund.dto.response.FundCreationResponse;
 import com.hoang.vaultly.modules.fund.dto.response.FundMemberResponse;
+import com.hoang.vaultly.modules.fund.dto.response.FundResponse;
 import com.hoang.vaultly.modules.fund.service.FundMemberShipService;
 import com.hoang.vaultly.modules.fund.service.FundService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -22,9 +24,24 @@ public class FundController {
     private final FundService fundService;
     private final FundMemberShipService fundMemberShipService;
 
-    @PostMapping("/create-fund")
+    @PostMapping
     public ApiResponse<FundCreationResponse> createFund(@Valid @RequestBody FundCreationRequest request) {
         return ApiResponse.success(fundService.createFund(request));
+    }
+
+    @GetMapping
+    public ApiResponse<List<FundResponse>> getMyFunds() {
+        return ApiResponse.success(fundService.getMyFunds());
+    }
+
+    @GetMapping("/{fundId}")
+    public ApiResponse<FundResponse> getFundById(@PathVariable UUID fundId) {
+        return ApiResponse.success(fundService.getFundById(fundId));
+    }
+
+    @GetMapping("/{fundId}/members")
+    public ApiResponse<List<FundMemberResponse>> getMembers(@PathVariable UUID fundId) {
+        return ApiResponse.success(fundMemberShipService.getMembers(fundId));
     }
 
     @PostMapping("/{fundId}/members")
@@ -45,5 +62,12 @@ public class FundController {
                                                      @PathVariable UUID memberId,
                                                      @Valid @RequestBody RemoveRoleRequest request) {
         return ApiResponse.success(fundMemberShipService.removeRole(fundId, memberId, request.role()));
+    }
+
+    @DeleteMapping("/{fundId}/members/{memberId}")
+    public ApiResponse<String> removeMember(@PathVariable UUID fundId,
+                                           @PathVariable UUID memberId) {
+        fundMemberShipService.removeMember(fundId, memberId);
+        return ApiResponse.success("Member removed successfully", null);
     }
 }
