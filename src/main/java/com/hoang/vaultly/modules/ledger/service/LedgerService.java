@@ -8,6 +8,7 @@ import com.hoang.vaultly.modules.fund.repository.FundMemberRepository;
 import com.hoang.vaultly.modules.fund.repository.FundRepository;
 import com.hoang.vaultly.modules.ledger.dto.request.LedgerTransactionRequest;
 import com.hoang.vaultly.modules.ledger.dto.response.FundBalanceResponse;
+import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionDetailResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionResponse;
 import com.hoang.vaultly.modules.ledger.entity.LedgerAccount;
 import com.hoang.vaultly.modules.ledger.entity.LedgerTransaction;
@@ -21,6 +22,8 @@ import com.hoang.vaultly.modules.ledger.repository.LedgerTransactionRepository;
 import com.hoang.vaultly.modules.user.entity.User;
 import com.hoang.vaultly.modules.user.service.UserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -61,6 +64,7 @@ public class LedgerService {
         LedgerTransaction ledgerTransaction = LedgerTransaction.builder()
                 .transactionType(TransactionType.DEPOSIT)
                 .transactionStatus(TransactionStatus.COMPLETED)
+                .amount(request.amount())
                 .createdBy(currentUser)
                 .fund(fund)
                 .description(request.description())
@@ -108,6 +112,7 @@ public class LedgerService {
         LedgerTransaction ledgerTransaction = LedgerTransaction.builder()
                 .transactionType(TransactionType.WITHDRAWAL)
                 .transactionStatus(TransactionStatus.COMPLETED)
+                .amount(request.amount())
                 .fund(fund)
                 .createdBy(currentUser)
                 .description(request.description())
@@ -151,6 +156,7 @@ public class LedgerService {
         LedgerTransaction ledgerTransaction = LedgerTransaction.builder()
                 .transactionType(TransactionType.EXPENSE)
                 .transactionStatus(TransactionStatus.COMPLETED)
+                .amount(request.amount())
                 .fund(fund)
                 .createdBy(currentUser)
                 .description(request.description())
@@ -186,17 +192,27 @@ public class LedgerService {
     /**
      * Get the transaction log
      *
-     * @return a List of LedgerTransactionResponse
+     * @return a page of LedgerTransactionResponse
      */
-    public List<LedgerTransactionResponse> getTransactions(UUID fundId) {
+    public Page<LedgerTransactionResponse> getTransactions(UUID fundId, Pageable pageable) {
         // Ensure fund exists and member the service caller belongs to fund
         getFund(fundId);
         getMember(fundId, userService.getCurrentUser().getId());
 
         return ledgerTransactionRepository
-                .findByFund_IdOrderByCreatedAtDesc(fundId)
-                .stream().map(transactionResponseMapper::toLedgerTransactionResponse)
-                .collect(Collectors.toList());
+                .findByFund_Id(fundId, pageable)
+                .map(transactionResponseMapper::toLedgerTransactionResponse);
+    }
+
+    public LedgerTransactionDetailResponse getTransactionDetail(UUID fundId, UUID transactionId) {
+        getFund(fundId);
+        getMember(fundId, userService.getCurrentUser().getId());
+
+        LedgerTransaction transaction = ledgerTransactionRepository
+                .findByIdAndFund_Id(transactionId, fundId)
+                .orElseThrow(() -> new AppException(ErrorCode.TRANSACTION_NOT_FOUND));
+
+        return transactionResponseMapper.toLedgerTransactionDetailResponse(transaction);
     }
 
     private Fund getFund(UUID fundId) {
