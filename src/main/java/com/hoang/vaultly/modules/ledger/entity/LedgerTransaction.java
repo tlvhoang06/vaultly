@@ -31,8 +31,11 @@ public class LedgerTransaction {
     UUID id;
 
     @Builder.Default
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "transaction", cascade = CascadeType.PERSIST)
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "transaction", cascade = CascadeType.PERSIST)
     List<LedgerEntry> ledgerEntries = new ArrayList<>();
+
+    @Column(nullable = false, updatable = false)
+    BigDecimal amount;
 
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
