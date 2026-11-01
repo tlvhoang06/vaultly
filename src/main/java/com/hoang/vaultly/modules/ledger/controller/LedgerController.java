@@ -3,13 +3,17 @@ package com.hoang.vaultly.modules.ledger.controller;
 import com.hoang.vaultly.common.dto.ApiResponse;
 import com.hoang.vaultly.modules.ledger.dto.request.LedgerTransactionRequest;
 import com.hoang.vaultly.modules.ledger.dto.response.FundBalanceResponse;
+import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionDetailResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionResponse;
 import com.hoang.vaultly.modules.ledger.service.LedgerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
+import org.springframework.data.web.PageableDefault;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -48,7 +52,18 @@ public class LedgerController {
     }
 
     @GetMapping("/transactions")
-    public ApiResponse<List<LedgerTransactionResponse>> getTransactions(@PathVariable UUID fundId){
-        return ApiResponse.success(ledgerService.getTransactions(fundId));
+    public ApiResponse<Page<LedgerTransactionResponse>> getTransactions(
+            @PathVariable UUID fundId,
+            @PageableDefault(size = 20, sort = "createdAt", direction = Sort.Direction.DESC) Pageable pageable
+    ){
+        return ApiResponse.success(ledgerService.getTransactions(fundId, pageable));
+    }
+
+    @GetMapping("/transactions/{transactionId}")
+    public ApiResponse<LedgerTransactionDetailResponse> getTransactionDetail(
+            @PathVariable UUID fundId,
+            @PathVariable UUID transactionId
+    ){
+        return ApiResponse.success(ledgerService.getTransactionDetail(fundId, transactionId));
     }
 }
