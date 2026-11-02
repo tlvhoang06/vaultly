@@ -117,4 +117,7 @@ public class AuthService {
                 .build();
     }
 
+    public void logout() {
+        SecurityContextHolder.clearContext();
+    }
 }
