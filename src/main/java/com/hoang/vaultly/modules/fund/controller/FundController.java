@@ -3,6 +3,7 @@ package com.hoang.vaultly.modules.fund.controller;
 import com.hoang.vaultly.common.dto.ApiResponse;
 import com.hoang.vaultly.modules.fund.dto.request.AssignRoleRequest;
 import com.hoang.vaultly.modules.fund.dto.request.FundCreationRequest;
+import com.hoang.vaultly.modules.fund.dto.request.FundUpdateRequest;
 import com.hoang.vaultly.modules.fund.dto.request.InviteMemberRequest;
 import com.hoang.vaultly.modules.fund.dto.request.RemoveRoleRequest;
 import com.hoang.vaultly.modules.fund.dto.response.FundCreationResponse;
@@ -37,6 +38,19 @@ public class FundController {
     @GetMapping("/{fundId}")
     public ApiResponse<FundResponse> getFundById(@PathVariable UUID fundId) {
         return ApiResponse.success(fundService.getFundById(fundId));
+    }
+
+    @PutMapping("/{fundId}")
+    public ApiResponse<FundResponse> updateFund(
+            @PathVariable UUID fundId,
+            @Valid @RequestBody FundUpdateRequest request
+    ) {
+        return ApiResponse.success(fundService.updateFund(fundId, request));
+    }
+
+    @PatchMapping("/{fundId}/close")
+    public ApiResponse<FundResponse> closeFund(@PathVariable UUID fundId) {
+        return ApiResponse.success(fundService.closeFund(fundId));
     }
 
     @GetMapping("/{fundId}/members")

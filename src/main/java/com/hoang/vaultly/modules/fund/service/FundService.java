@@ -3,6 +3,7 @@ package com.hoang.vaultly.modules.fund.service;
 import com.hoang.vaultly.common.exception.AppException;
 import com.hoang.vaultly.common.exception.ErrorCode;
 import com.hoang.vaultly.modules.fund.dto.request.FundCreationRequest;
+import com.hoang.vaultly.modules.fund.dto.request.FundUpdateRequest;
 import com.hoang.vaultly.modules.fund.dto.response.FundCreationResponse;
 import com.hoang.vaultly.modules.fund.dto.response.FundResponse;
 import com.hoang.vaultly.modules.fund.entity.Fund;
@@ -66,6 +67,31 @@ public class FundService {
         User currentUser = userService.getCurrentUser();
         FundMember member = fundMemberRepository.findByFund_IdAndUser_Id(fundId, currentUser.getId())
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_IN_FUND));
+
+        return fundMapper.toFundResponse(member);
+    }
+
+    public FundResponse updateFund(UUID fundId, FundUpdateRequest request) {
+        User currentUser = userService.getCurrentUser();
+        FundMember member = fundMemberRepository.findByFund_IdAndUser_Id(fundId, currentUser.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_IN_FUND));
+
+        Fund fund = member.getFund();
+        fund.setName(request.name());
+        fund.setDescription(request.description());
+        fundRepository.save(fund);
+
+        return fundMapper.toFundResponse(member);
+    }
+
+    public FundResponse closeFund(UUID fundId) {
+        User currentUser = userService.getCurrentUser();
+        FundMember member = fundMemberRepository.findByFund_IdAndUser_Id(fundId, currentUser.getId())
+                .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_IN_FUND));
+
+        Fund fund = member.getFund();
+        fund.setStatus(FundStatus.CLOSED);
+        fundRepository.save(fund);
 
         return fundMapper.toFundResponse(member);
     }
