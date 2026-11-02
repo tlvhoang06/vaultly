@@ -5,6 +5,7 @@ import com.hoang.vaultly.modules.ledger.dto.request.LedgerTransactionRequest;
 import com.hoang.vaultly.modules.ledger.dto.response.FundBalanceResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionDetailResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionResponse;
+import com.hoang.vaultly.modules.ledger.dto.response.MemberBalanceResponse;
 import com.hoang.vaultly.modules.ledger.service.LedgerService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -49,6 +50,14 @@ public class LedgerController {
     @GetMapping("/balance")
     public ApiResponse<FundBalanceResponse> getFundBalance(@PathVariable UUID fundId){
         return ApiResponse.success(ledgerService.getFundBalance(fundId));
+    }
+
+    @GetMapping("/members/{memberId}/balance")
+    public ApiResponse<MemberBalanceResponse> getMemberBalance(
+            @PathVariable UUID fundId,
+            @PathVariable UUID memberId
+    ) {
+        return ApiResponse.success(ledgerService.getMemberBalance(fundId, memberId));
     }
 
     @GetMapping("/transactions")

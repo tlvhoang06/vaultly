@@ -10,6 +10,7 @@ import com.hoang.vaultly.modules.ledger.dto.request.LedgerTransactionRequest;
 import com.hoang.vaultly.modules.ledger.dto.response.FundBalanceResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionDetailResponse;
 import com.hoang.vaultly.modules.ledger.dto.response.LedgerTransactionResponse;
+import com.hoang.vaultly.modules.ledger.dto.response.MemberBalanceResponse;
 import com.hoang.vaultly.modules.ledger.entity.LedgerAccount;
 import com.hoang.vaultly.modules.ledger.entity.LedgerTransaction;
 import com.hoang.vaultly.modules.ledger.enums.AccountType;
@@ -187,6 +188,26 @@ public class LedgerService {
 
         return new FundBalanceResponse(fundId, fund.getCurrency(), getBalance(cashAccount), getBalance(expenseAccount),
                 getBalance(memberEquity));
+    }
+
+    public MemberBalanceResponse getMemberBalance(UUID fundId, UUID memberId) {
+        Fund fund = getFund(fundId);
+        User currentUser = userService.getCurrentUser();
+        getMember(fundId, currentUser.getId());
+
+        FundMember targetMember = fundMemberRepository
+                .findByIdAndFund_Id(memberId, fundId)
+                .orElseThrow(() -> new AppException(ErrorCode.FUND_MEMBER_NOT_FOUND));
+
+        LedgerAccount memberEquity = getMemberAccount(targetMember.getId(), AccountType.MEMBER_EQUITY);
+
+        return new MemberBalanceResponse(
+                fundId,
+                targetMember.getId(),
+                targetMember.getUser().getId(),
+                fund.getCurrency(),
+                getBalance(memberEquity)
+        );
     }
 
     /**

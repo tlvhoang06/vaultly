@@ -9,6 +9,7 @@ import java.util.UUID;
 
 public interface FundMemberRepository extends JpaRepository<FundMember, UUID> {
     Optional<FundMember> findByFund_IdAndUser_Id(UUID fundId, UUID userId);
+    Optional<FundMember> findByIdAndFund_Id(UUID id, UUID fundId);
     boolean existsByFund_IdAndUser_Id(UUID fundId, UUID userId);
     List<FundMember> findByUser_Id(UUID userId);
     List<FundMember> findByFund_Id(UUID fundId);
