@@ -15,7 +15,6 @@ public record FundMemberResponse(
         UUID userId,
         String username,
         String displayName,
-        BigDecimal contributionRatio,
         Instant joinedAt,
         Set<FundRole> roles
 ) {}

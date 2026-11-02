@@ -1,6 +1,6 @@
 package com.hoang.vaultly.modules.auth.controller;
 
-
+import com.hoang.vaultly.common.dto.ApiResponse;
 import com.hoang.vaultly.modules.auth.dto.request.*;
 import com.hoang.vaultly.modules.auth.dto.response.AuthResponse;
 import com.hoang.vaultly.modules.auth.dto.response.ChangePasswordResponse;
@@ -21,30 +21,27 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("/login")
-    public AuthResponse login(@Valid @RequestBody AuthRequest request){
-        return authService.authenticate(request);
+    public ApiResponse<AuthResponse> login(@Valid @RequestBody AuthRequest request){
+        return ApiResponse.success(authService.authenticate(request));
     }
 
     @PostMapping("/register")
-    public RegisterResponse register(@Valid @RequestBody RegisterRequest request){
-        return authService.register(request);
+    public ApiResponse<RegisterResponse> register(@Valid @RequestBody RegisterRequest request){
+        return ApiResponse.success(authService.register(request));
     }
 
     @PostMapping("/change-password")
-    public ChangePasswordResponse changePassword(@Valid @RequestBody ChangePasswordRequest request){
-        return authService.changePassword(request);
+    public ApiResponse<ChangePasswordResponse> changePassword(@Valid @RequestBody ChangePasswordRequest request){
+        return ApiResponse.success(authService.changePassword(request));
     }
 
     @PostMapping("/introspect")
-    public IntrospectResponse introspect(@Valid @RequestBody IntrospectRequest request){
-        return authService.introspect(request);
+    public ApiResponse<IntrospectResponse> introspect(@Valid @RequestBody IntrospectRequest request){
+        return ApiResponse.success(authService.introspect(request));
     }
 
     @PostMapping("/refresh")
-    public AuthResponse refresh(@Valid @RequestBody RefreshRequest request){
-        return authService.refreshToken(request);
+    public ApiResponse<AuthResponse> refresh(@Valid @RequestBody RefreshRequest request){
+        return ApiResponse.success(authService.refreshToken(request));
     }
-
-
-
 }
