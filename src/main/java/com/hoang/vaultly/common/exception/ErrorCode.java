@@ -21,6 +21,7 @@ public enum ErrorCode {
 
     // Fund Exception
     FUND_NOT_FOUND(1201, "Fund not found", HttpStatus.NOT_FOUND),
+    FUND_IS_CLOSED(1202, "Fund is closed and cannot perform this operation", HttpStatus.BAD_REQUEST),
 
     // Fund Member Exception
     FUND_MEMBER_NOT_FOUND(1301, "Fund member not found", HttpStatus.NOT_FOUND),
