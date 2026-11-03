@@ -8,6 +8,7 @@ import com.hoang.vaultly.modules.fund.entity.Fund;
 import com.hoang.vaultly.modules.fund.entity.FundMember;
 import com.hoang.vaultly.modules.fund.entity.FundMemberRole;
 import com.hoang.vaultly.modules.fund.enums.FundRole;
+import com.hoang.vaultly.modules.fund.enums.FundStatus;
 import com.hoang.vaultly.modules.fund.mapper.FundMemberMapper;
 import com.hoang.vaultly.modules.fund.repository.FundMemberRepository;
 import com.hoang.vaultly.modules.fund.repository.FundRepository;
@@ -52,6 +53,9 @@ public class FundMemberShipService {
                 .findById(request.userId())
                 .orElseThrow(() -> new AppException(ErrorCode.USER_NOT_FOUND));
         Fund fund = fundRepository.findById(fundId).orElseThrow(() -> new AppException(ErrorCode.FUND_NOT_FOUND));
+        if (fund.getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
+        }
         FundMember fundMember = FundMember.builder().user(user).fund(fund).build();
 
         if (request.roles() != null) {
@@ -75,6 +79,10 @@ public class FundMemberShipService {
 
         if (!fundMember.getFund().getId().equals(fundId)) {
             throw new AppException(ErrorCode.MEMBER_NOT_IN_FUND);
+        }
+
+        if (fundMember.getFund().getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
         }
 
         boolean roleExists = fundMember
@@ -106,6 +114,10 @@ public class FundMemberShipService {
             throw new AppException(ErrorCode.MEMBER_NOT_IN_FUND);
         }
 
+        if (fundMember.getFund().getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
+        }
+
         if (fundMember.getRoles().size() <= 1) {
             throw new AppException(ErrorCode.MEMBER_MUST_HAVE_ONE_ROLE);
         }
@@ -127,6 +139,10 @@ public class FundMemberShipService {
 
         if (!member.getFund().getId().equals(fundId)) {
             throw new AppException(ErrorCode.MEMBER_NOT_IN_FUND);
+        }
+
+        if (member.getFund().getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
         }
 
         boolean isOwner = member.getRoles().stream()

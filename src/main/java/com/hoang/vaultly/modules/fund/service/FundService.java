@@ -77,6 +77,9 @@ public class FundService {
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_IN_FUND));
 
         Fund fund = member.getFund();
+        if (fund.getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
+        }
         fund.setName(request.name());
         fund.setDescription(request.description());
         fundRepository.save(fund);
@@ -90,6 +93,9 @@ public class FundService {
                 .orElseThrow(() -> new AppException(ErrorCode.MEMBER_NOT_IN_FUND));
 
         Fund fund = member.getFund();
+        if (fund.getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
+        }
         fund.setStatus(FundStatus.CLOSED);
         fundRepository.save(fund);
 
