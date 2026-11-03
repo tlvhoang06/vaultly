@@ -4,6 +4,7 @@ import com.hoang.vaultly.common.exception.AppException;
 import com.hoang.vaultly.common.exception.ErrorCode;
 import com.hoang.vaultly.modules.fund.entity.Fund;
 import com.hoang.vaultly.modules.fund.entity.FundMember;
+import com.hoang.vaultly.modules.fund.enums.FundStatus;
 import com.hoang.vaultly.modules.fund.repository.FundMemberRepository;
 import com.hoang.vaultly.modules.fund.repository.FundRepository;
 import com.hoang.vaultly.modules.ledger.dto.request.LedgerTransactionRequest;
@@ -51,6 +52,9 @@ public class LedgerService {
      */
     public LedgerTransactionResponse deposit(UUID fundId, LedgerTransactionRequest request) {
         Fund fund = getFund(fundId);
+        if (fund.getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
+        }
         User currentUser = userService.getCurrentUser();
         FundMember fundMember = getMember(fundId, currentUser.getId());
 
@@ -87,6 +91,9 @@ public class LedgerService {
      */
     public LedgerTransactionResponse withdrawal(UUID fundId, LedgerTransactionRequest request) {
         Fund fund = getFund(fundId);
+        if (fund.getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
+        }
         User currentUser = userService.getCurrentUser();
         FundMember fundMember = getMember(fundId, currentUser.getId());
 
@@ -136,6 +143,9 @@ public class LedgerService {
      */
     public LedgerTransactionResponse expense(UUID fundId, LedgerTransactionRequest request) {
         Fund fund = getFund(fundId);
+        if (fund.getStatus() == FundStatus.CLOSED) {
+            throw new AppException(ErrorCode.FUND_IS_CLOSED);
+        }
         User currentUser = userService.getCurrentUser();
         FundMember fundMember = getMember(fundId, currentUser.getId());
 
