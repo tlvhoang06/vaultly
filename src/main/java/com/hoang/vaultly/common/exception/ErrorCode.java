@@ -32,7 +32,8 @@ public enum ErrorCode {
     CANNOT_ASSIGN_OWNER(1306, "Fund has to have at most 1 owner", HttpStatus.BAD_REQUEST),
     ALREADY_FUND_MEMBER(1307, "User is already in this fund", HttpStatus.BAD_REQUEST),
     MEMBER_MUST_HAVE_ONE_ROLE(1308, "Member must have at least one role", HttpStatus.BAD_REQUEST),
-    CANNOT_REMOVE_MEMBER_WITH_TRANSACTIONS(1309, "Cannot remove member with transaction history", HttpStatus.BAD_REQUEST),
+    CANNOT_REMOVE_MEMBER_WITH_TRANSACTIONS(1309, "Cannot remove member with transaction history",
+            HttpStatus.BAD_REQUEST),
     MEMBER_HAS_ACTIVE_BALANCE(1310, "Member still has balance in fund", HttpStatus.BAD_REQUEST),
 
     // Ledger Exception
@@ -42,13 +43,16 @@ public enum ErrorCode {
 
     // Transaction Exception
     TRANSACTION_DUPLICATE(1501, "Idempotency key hits, this transaction exists", HttpStatus.BAD_REQUEST),
-    TRANSACTION_NOT_FOUND(1502, "Transaction not found", HttpStatus.NOT_FOUND);
+    TRANSACTION_NOT_FOUND(1502, "Transaction not found", HttpStatus.NOT_FOUND),
+    UNBALANCED_TRANSACTION(1503, "Transaction debits and credits must be equa", HttpStatus.BAD_REQUEST),
+    TRANSACTION_AMOUNT_MISMATCH(1505, "Transaction total amount must match total debited amount", HttpStatus.BAD_REQUEST),
+    INVALID_TRANSACTION_ENTRIES(1504, "Transaction must contain at least two ledger entries", HttpStatus.BAD_REQUEST);
 
     int code;
     String message;
     HttpStatus statusCode;
 
-    ErrorCode(int code, String message, HttpStatus statusCode){
+    ErrorCode(int code, String message, HttpStatus statusCode) {
         this.code = code;
         this.message = message;
         this.statusCode = statusCode;
