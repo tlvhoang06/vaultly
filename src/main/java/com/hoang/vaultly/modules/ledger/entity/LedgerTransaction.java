@@ -94,7 +94,7 @@ public class LedgerTransaction {
         }
 
         // Check SUM(DEBIT) == declared amount
-        if(totalDebit.compareTo(this.amount) != 0){
+        if(this.amount == null || totalDebit.compareTo(this.amount) != 0){
             throw new AppException(ErrorCode.TRANSACTION_AMOUNT_MISMATCH);
         }
     }

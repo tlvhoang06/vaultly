@@ -4,7 +4,9 @@ import com.hoang.vaultly.modules.ledger.entity.LedgerAccount;
 import com.hoang.vaultly.modules.ledger.enums.AccountType;
 import com.hoang.vaultly.modules.ledger.enums.EntryType;
 import com.hoang.vaultly.modules.ledger.enums.TransactionStatus;
+import jakarta.persistence.LockModeType;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Lock;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -18,14 +20,33 @@ public interface LedgerAccountRepository extends JpaRepository<LedgerAccount, UU
     Optional<LedgerAccount> findByFundMember_IdAndAccountType(UUID fundMemberId, AccountType accountType);
 
     @Query("""
-    SELECT COALESCE(
-        SUM(CASE WHEN e.entryType = :normalSide THEN e.amount ELSE -e.amount END),
-        0
-    )
-    FROM LedgerEntry e
-    WHERE e.ledgerAccount.id = :accountId
-      AND e.transaction.transactionStatus = :status
-""")
+            SELECT a
+            FROM LedgerAccount a
+            WHERE a.fund.id = :fundId
+            AND a.accountType = :accountType
+            """)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<LedgerAccount> findFundAccountForUpdate(@Param("fundId") UUID fundId,
+                                                     @Param("accountType") AccountType accountType);
+
+    @Query("""
+            SELECT a
+            FROM LedgerAccount a
+            WHERE a.fundMember.id = :memberId
+            AND a.accountType = :accountType
+            """)
+    @Lock(LockModeType.PESSIMISTIC_WRITE)
+    Optional<LedgerAccount> findMemberAccountForUpdate(@Param("memberId") UUID fundMemberId,
+                                                      @Param("accountType") AccountType accountType);
+
+    @Query("""
+            SELECT COALESCE(
+                SUM(CASE WHEN e.entryType = :normalSide THEN e.amount ELSE -e.amount END), 0
+            )
+            FROM LedgerEntry e
+            WHERE e.ledgerAccount.id = :accountId
+              AND e.transaction.transactionStatus = :status
+            """)
     BigDecimal calculateAccountBalance(
             @Param("accountId") UUID accountId,
             @Param("normalSide") EntryType normalSide,
