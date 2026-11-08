@@ -1,5 +1,7 @@
 package com.hoang.vaultly.modules.ledger.entity;
 
+import com.hoang.vaultly.common.exception.AppException;
+import com.hoang.vaultly.common.exception.ErrorCode;
 import com.hoang.vaultly.modules.fund.entity.Fund;
 import com.hoang.vaultly.modules.ledger.enums.EntryType;
 import com.hoang.vaultly.modules.ledger.enums.TransactionStatus;
@@ -61,6 +63,41 @@ public class LedgerTransaction {
     @Column(name = "idempotency_key", nullable = false, updatable = false)
     UUID idempotencyKey;
 
+    @PrePersist
+    @PreUpdate
+    public void validateDoubleEntryBalance(){
+        // LedgerEntries should contain at least two entries
+        if(this.ledgerEntries == null || this.ledgerEntries.size() < 2){
+            throw new AppException(ErrorCode.INVALID_TRANSACTION_ENTRIES);
+        }
+
+        BigDecimal totalCredit = BigDecimal.ZERO;
+        BigDecimal totalDebit = BigDecimal.ZERO;
+
+        for(var entry : ledgerEntries){
+            BigDecimal entryAmount = entry.getAmount();
+            // Ensure entryAmount is positive
+            if(entryAmount == null || entryAmount.compareTo(BigDecimal.ZERO) <= 0){
+                throw new AppException(ErrorCode.INSUFFICIENT_FUND_CASH);
+            }
+
+            if(entry.getEntryType() == EntryType.DEBIT){
+                totalDebit = totalDebit.add(entryAmount);
+            }
+            else if(entry.getEntryType() == EntryType.CREDIT){
+                totalCredit = totalCredit.add(entryAmount);
+            }
+        }
+        // Check SUM(DEBIT) == SUM(CREDIT)
+        if(totalDebit.compareTo(totalCredit) != 0){
+            throw new AppException(ErrorCode.UNBALANCED_TRANSACTION);
+        }
+
+        // Check SUM(DEBIT) == declared amount
+        if(this.amount == null || totalDebit.compareTo(this.amount) != 0){
+            throw new AppException(ErrorCode.TRANSACTION_AMOUNT_MISMATCH);
+        }
+    }
     public void recordEntry(LedgerAccount account, EntryType entryType, BigDecimal amount) {
         LedgerEntry entry = LedgerEntry.builder()
                 .entryType(entryType)

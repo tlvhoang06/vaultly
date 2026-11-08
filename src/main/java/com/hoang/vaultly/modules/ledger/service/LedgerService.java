@@ -27,11 +27,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigDecimal;
-import java.util.List;
 import java.util.UUID;
-import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -50,6 +49,7 @@ public class LedgerService {
      * - DEBIT: CASH
      * - CREDIT: MEMBER_EQUITY
      */
+    @Transactional
     public LedgerTransactionResponse deposit(UUID fundId, LedgerTransactionRequest request) {
         Fund fund = getFund(fundId);
         if (fund.getStatus() == FundStatus.CLOSED) {
@@ -89,6 +89,7 @@ public class LedgerService {
      * - DEBIT: MEMBER_EQUITY
      * - CREDIT: CASH
      */
+    @Transactional
     public LedgerTransactionResponse withdrawal(UUID fundId, LedgerTransactionRequest request) {
         Fund fund = getFund(fundId);
         if (fund.getStatus() == FundStatus.CLOSED) {
@@ -101,8 +102,8 @@ public class LedgerService {
         checkIdempotencyKey(fundId, request.idempotencyKey());
 
         // Find member and fund ledger accounts
-        LedgerAccount cashAccount = getFundAccount(fundId, AccountType.CASH);
-        LedgerAccount memberAccount = getMemberAccount(fundMember.getId(), AccountType.MEMBER_EQUITY);
+        LedgerAccount cashAccount = getFundAccountForUpdate(fundId, AccountType.CASH);
+        LedgerAccount memberAccount = getMemberAccountForUpdate(fundMember.getId(), AccountType.MEMBER_EQUITY);
 
         // Check if member equity is withdrawable
         BigDecimal memberEquity = getBalance(memberAccount);
@@ -141,6 +142,7 @@ public class LedgerService {
      * - DEBIT: EXPENSE
      * - CREDIT: CASH
      */
+    @Transactional
     public LedgerTransactionResponse expense(UUID fundId, LedgerTransactionRequest request) {
         Fund fund = getFund(fundId);
         if (fund.getStatus() == FundStatus.CLOSED) {
@@ -153,8 +155,8 @@ public class LedgerService {
         checkIdempotencyKey(fundId, request.idempotencyKey());
 
         // Find expense and cash ledger accounts
-        LedgerAccount cashAccount = getFundAccount(fundId, AccountType.CASH);
-        LedgerAccount expenseAccount = getFundAccount(fundId, AccountType.EXPENSE);
+        LedgerAccount cashAccount = getFundAccountForUpdate(fundId, AccountType.CASH);
+        LedgerAccount expenseAccount = getFundAccountForUpdate(fundId, AccountType.EXPENSE);
 
         // Check if fund cash is sufficient
         BigDecimal fundCash = getBalance(cashAccount);
@@ -187,6 +189,7 @@ public class LedgerService {
      *
      * @return FundBalanceResponse
      */
+    @Transactional(readOnly = true)
     public FundBalanceResponse getFundBalance(UUID fundId) {
         Fund fund = getFund(fundId);
         User currentUser = userService.getCurrentUser();
@@ -235,6 +238,7 @@ public class LedgerService {
                 .map(transactionResponseMapper::toLedgerTransactionResponse);
     }
 
+    @Transactional(readOnly = true)
     public LedgerTransactionDetailResponse getTransactionDetail(UUID fundId, UUID transactionId) {
         getFund(fundId);
         getMember(fundId, userService.getCurrentUser().getId());
@@ -265,6 +269,18 @@ public class LedgerService {
     private LedgerAccount getMemberAccount(UUID memberId, AccountType type) {
         return ledgerAccountRepository
                 .findByFundMember_IdAndAccountType(memberId, type)
+                .orElseThrow(() -> new AppException(ErrorCode.LEDGER_ACCOUNT_NOT_FOUND));
+    }
+
+    private LedgerAccount getFundAccountForUpdate(UUID fundId, AccountType type) {
+        return ledgerAccountRepository
+                .findFundAccountForUpdate(fundId, type)
+                .orElseThrow(() -> new AppException(ErrorCode.LEDGER_ACCOUNT_NOT_FOUND));
+    }
+
+    private LedgerAccount getMemberAccountForUpdate(UUID memberId, AccountType type) {
+        return ledgerAccountRepository
+                .findMemberAccountForUpdate(memberId, type)
                 .orElseThrow(() -> new AppException(ErrorCode.LEDGER_ACCOUNT_NOT_FOUND));
     }
 
