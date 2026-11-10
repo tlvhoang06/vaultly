@@ -35,16 +35,23 @@
 @FOR /F "usebackq tokens=1* delims==" %%A IN (`powershell -noprofile "& {$scriptDir='%~dp0'; $script='%__MVNW_ARG0_NAME__%'; icm -ScriptBlock ([Scriptblock]::Create((Get-Content -Raw '%~f0'))) -NoNewScope}"`) DO @(
   IF "%%A"=="MVN_CMD" (set __MVNW_CMD__=%%B) ELSE IF "%%B"=="" (echo %%A) ELSE (echo %%A=%%B)
 )
+
 @SET PSModulePath=%__MVNW_PSMODULEP_SAVE%
 @SET __MVNW_PSMODULEP_SAVE=
 @SET __MVNW_ARG0_NAME__=
 @SET MVNW_USERNAME=
 @SET MVNW_PASSWORD=
+
+@REM ==== AUTO LOAD .ENV FILE ====
+@IF EXIST "%~dp0.env" (
+  FOR /F "usebackq eol=# tokens=1* delims==" %%i IN ("%~dp0.env") DO @SET "%%i=%%~j"
+)
+@REM ==============================
+
 @IF NOT "%__MVNW_CMD__%"=="" ("%__MVNW_CMD__%" %*)
 @echo Cannot start maven from wrapper >&2 && exit /b 1
 @GOTO :EOF
 : end batch / begin powershell #>
-
 $ErrorActionPreference = "Stop"
 if ($env:MVNW_VERBOSE -eq "true") {
   $VerbosePreference = "Continue"

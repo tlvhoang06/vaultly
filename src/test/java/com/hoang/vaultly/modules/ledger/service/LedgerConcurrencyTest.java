@@ -72,7 +72,7 @@ public class LedgerConcurrencyTest {
         int threadCount = 10;
         BigDecimal withdrawalAmount = new BigDecimal("200000");
 
-        // create thread pool
+        // Create thread pool
         ExecutorService executorService = Executors.newFixedThreadPool(threadCount);
 
         // CountDownLatch: used as a start signal
