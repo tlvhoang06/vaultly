@@ -44,9 +44,15 @@ public enum ErrorCode {
     // Transaction Exception
     TRANSACTION_DUPLICATE(1501, "Idempotency key hits, this transaction exists", HttpStatus.BAD_REQUEST),
     TRANSACTION_NOT_FOUND(1502, "Transaction not found", HttpStatus.NOT_FOUND),
-    UNBALANCED_TRANSACTION(1503, "Transaction debits and credits must be equa", HttpStatus.BAD_REQUEST),
+    UNBALANCED_TRANSACTION(1503, "Transaction debits and credits must be equal", HttpStatus.BAD_REQUEST),
+    INVALID_TRANSACTION_ENTRIES(1504, "Transaction must contain at least two ledger entries", HttpStatus.BAD_REQUEST),
     TRANSACTION_AMOUNT_MISMATCH(1505, "Transaction total amount must match total debited amount", HttpStatus.BAD_REQUEST),
-    INVALID_TRANSACTION_ENTRIES(1504, "Transaction must contain at least two ledger entries", HttpStatus.BAD_REQUEST);
+    INVALID_TRANSACTION_AMOUNT(1506, "Transaction amount must be positive", HttpStatus.BAD_REQUEST),
+
+    // Common / System Exception
+    INVALID_REQUEST(4000, "Invalid request data", HttpStatus.BAD_REQUEST),
+    DATA_CONFLICT(4009, "Data conflict or duplicate constraint violation", HttpStatus.CONFLICT),
+    INTERNAL_SERVER_ERROR(9999, "Internal server error", HttpStatus.INTERNAL_SERVER_ERROR);
 
     int code;
     String message;

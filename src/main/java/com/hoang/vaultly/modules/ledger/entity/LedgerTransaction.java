@@ -78,7 +78,7 @@ public class LedgerTransaction {
             BigDecimal entryAmount = entry.getAmount();
             // Ensure entryAmount is positive
             if(entryAmount == null || entryAmount.compareTo(BigDecimal.ZERO) <= 0){
-                throw new AppException(ErrorCode.INSUFFICIENT_FUND_CASH);
+                throw new AppException(ErrorCode.INVALID_TRANSACTION_AMOUNT);
             }
 
             if(entry.getEntryType() == EntryType.DEBIT){
