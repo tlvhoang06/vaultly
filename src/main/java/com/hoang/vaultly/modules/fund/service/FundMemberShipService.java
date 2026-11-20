@@ -17,6 +17,7 @@ import com.hoang.vaultly.modules.user.entity.User;
 import com.hoang.vaultly.modules.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,7 @@ public class FundMemberShipService {
                 .toList();
     }
 
+    @Transactional
     public FundMemberResponse inviteMember(UUID fundId, InviteMemberRequest request) {
         if (request.roles() != null && request.roles().contains(FundRole.FUND_OWNER)) {
             throw new AppException(ErrorCode.CANNOT_ASSIGN_OWNER);
@@ -133,6 +135,7 @@ public class FundMemberShipService {
         return fundMemberMapper.toFundMemberResponse(savedMember);
     }
 
+    @Transactional
     public void removeMember(UUID fundId, UUID memberId) {
         FundMember member = fundMemberRepository.findById(memberId)
                 .orElseThrow(() -> new AppException(ErrorCode.FUND_MEMBER_NOT_FOUND));

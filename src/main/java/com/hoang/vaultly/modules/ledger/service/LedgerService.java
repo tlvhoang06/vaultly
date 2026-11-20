@@ -203,6 +203,7 @@ public class LedgerService {
                 getBalance(memberEquity));
     }
 
+    @Transactional(readOnly = true)
     public MemberBalanceResponse getMemberBalance(UUID fundId, UUID memberId) {
         Fund fund = getFund(fundId);
         User currentUser = userService.getCurrentUser();
@@ -228,6 +229,7 @@ public class LedgerService {
      *
      * @return a page of LedgerTransactionResponse
      */
+    @Transactional(readOnly = true)
     public Page<LedgerTransactionResponse> getTransactions(UUID fundId, Pageable pageable) {
         // Ensure fund exists and member the service caller belongs to fund
         getFund(fundId);
