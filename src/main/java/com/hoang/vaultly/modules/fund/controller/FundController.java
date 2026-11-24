@@ -9,6 +9,8 @@ import com.hoang.vaultly.modules.fund.dto.request.RemoveRoleRequest;
 import com.hoang.vaultly.modules.fund.dto.response.FundCreationResponse;
 import com.hoang.vaultly.modules.fund.dto.response.FundMemberResponse;
 import com.hoang.vaultly.modules.fund.dto.response.FundResponse;
+import com.hoang.vaultly.modules.fund.enums.FundPermission;
+import com.hoang.vaultly.modules.fund.security.RequireFundPermission;
 import com.hoang.vaultly.modules.fund.service.FundMemberShipService;
 import com.hoang.vaultly.modules.fund.service.FundService;
 import jakarta.validation.Valid;
@@ -35,11 +37,13 @@ public class FundController {
         return ApiResponse.success(fundService.getMyFunds());
     }
 
+    @RequireFundPermission(FundPermission.FUND_READ)
     @GetMapping("/{fundId}")
     public ApiResponse<FundResponse> getFundById(@PathVariable UUID fundId) {
         return ApiResponse.success(fundService.getFundById(fundId));
     }
 
+    @RequireFundPermission(FundPermission.FUND_UPDATE)
     @PutMapping("/{fundId}")
     public ApiResponse<FundResponse> updateFund(
             @PathVariable UUID fundId,
@@ -48,22 +52,26 @@ public class FundController {
         return ApiResponse.success(fundService.updateFund(fundId, request));
     }
 
+    @RequireFundPermission(FundPermission.FUND_CLOSE)
     @PatchMapping("/{fundId}/close")
     public ApiResponse<FundResponse> closeFund(@PathVariable UUID fundId) {
         return ApiResponse.success(fundService.closeFund(fundId));
     }
 
+    @RequireFundPermission(FundPermission.FUND_READ)
     @GetMapping("/{fundId}/members")
     public ApiResponse<List<FundMemberResponse>> getMembers(@PathVariable UUID fundId) {
         return ApiResponse.success(fundMemberShipService.getMembers(fundId));
     }
 
+    @RequireFundPermission(FundPermission.MEMBER_INVITE)
     @PostMapping("/{fundId}/members")
     public ApiResponse<FundMemberResponse> inviteMember(@PathVariable UUID fundId,
                                                        @Valid @RequestBody InviteMemberRequest request) {
         return ApiResponse.success(fundMemberShipService.inviteMember(fundId, request));
     }
 
+    @RequireFundPermission(FundPermission.ROLE_MANAGE)
     @PostMapping("/{fundId}/members/{memberId}/roles")
     public ApiResponse<FundMemberResponse> assignRole(@PathVariable UUID fundId,
                                                      @PathVariable UUID memberId,
@@ -71,6 +79,7 @@ public class FundController {
         return ApiResponse.success(fundMemberShipService.assignRole(fundId, memberId, request.role()));
     }
 
+    @RequireFundPermission(FundPermission.ROLE_MANAGE)
     @DeleteMapping("/{fundId}/members/{memberId}/roles")
     public ApiResponse<FundMemberResponse> removeRole(@PathVariable UUID fundId,
                                                      @PathVariable UUID memberId,
@@ -78,6 +87,7 @@ public class FundController {
         return ApiResponse.success(fundMemberShipService.removeRole(fundId, memberId, request.role()));
     }
 
+    @RequireFundPermission(FundPermission.MEMBER_REMOVE)
     @DeleteMapping("/{fundId}/members/{memberId}")
     public ApiResponse<String> removeMember(@PathVariable UUID fundId,
                                            @PathVariable UUID memberId) {
